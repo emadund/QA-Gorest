@@ -1,0 +1,282 @@
+{
+	"info": {
+		"_postman_id": "f05869c5-5ca5-416a-a7d0-cd3ee279328d",
+		"name": "Test GoREST",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21819289"
+	},
+	"item": [
+		{
+			"name": "Create New User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Successful response code', () => {\r",
+							"    pm.expect(pm.response.code).to.be.equal(201);\r",
+							"});\r",
+							"\r",
+							"pm.test('New User ID generated', () => {\r",
+							"    let newUserId = pm.response.json().id;\r",
+							"    pm.expect(newUserId).to.not.be.undefined;\r",
+							"    pm.collectionVariables.set('NEW_USER_ID', newUserId);\r",
+							"});\r",
+							"\r",
+							"pm.test('New User really exists', () => {\r",
+							"    pm.sendRequest({\r",
+							"        url: `https://gorest.co.in/public/v2/users/${pm.collectionVariables.get('NEW_USER_ID')}/`,\r",
+							"        header: {\r",
+							"            \"Accept\": \"application/json\",\r",
+							"            \"Content-Type\": \"application/json\",\r",
+							"            \"Authorization\": `Bearer ${pm.variables.get('ACCESS_TOKEN')}`\r",
+							"        }\r",
+							"    }, (err, response) => {\r",
+							"        pm.expect(pm.response.code).to.be.oneOf([200, 201]);\r",
+							"        pm.expect(pm.response.json().id).to.be.equal(pm.collectionVariables.get('NEW_USER_ID'));\r",
+							"    })\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"email\": \"{{$randomEmail}}\",\r\n    \"gender\": \"male\",\r\n    \"status\": \"active\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://gorest.co.in/public/v2/users",
+					"protocol": "https",
+					"host": [
+						"gorest",
+						"co",
+						"in"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update User Details",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Successful response code', () => {\r",
+							"    pm.expect(pm.response.code).to.be.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test('User name really updated', () => {\r",
+							"    pm.sendRequest({\r",
+							"        url: `https://gorest.co.in/public/v2/users/${pm.collectionVariables.get('NEW_USER_ID')}/`,\r",
+							"        header: {\r",
+							"            \"Accept\": \"application/json\",\r",
+							"            \"Content-Type\": \"application/json\",\r",
+							"            \"Authorization\": `Bearer ${pm.variables.get('ACCESS_TOKEN')}`\r",
+							"        }\r",
+							"    }, (err, response) => {\r",
+							"        pm.expect(pm.response.code).to.be.equal(200);\r",
+							"        pm.expect(pm.response.json().name).to.be.equal('New Name');\r",
+							"    })\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"New Name\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://gorest.co.in/public/v2/users/{{NEW_USER_ID}}/",
+					"protocol": "https",
+					"host": [
+						"gorest",
+						"co",
+						"in"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						"{{NEW_USER_ID}}",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Successful response code', () => {\r",
+							"    pm.expect(pm.response.code).to.be.equal(204);\r",
+							"});\r",
+							"\r",
+							"pm.test('User really deleted', () => {\r",
+							"    pm.sendRequest({\r",
+							"        url: `https://gorest.co.in/public/v2/users/${pm.collectionVariables.get('NEW_USER_ID')}/`,\r",
+							"        header: {\r",
+							"            \"Accept\": \"application/json\",\r",
+							"            \"Content-Type\": \"application/json\",\r",
+							"            \"Authorization\": `Bearer ${pm.variables.get('ACCESS_TOKEN')}`\r",
+							"        }\r",
+							"    }, (_, res) => {\r",
+							"        pm.expect(res.code).to.be.equal(404);\r",
+							"        pm.expect(res.json().message).to.be.equal('Resource not found');\r",
+							"    })\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "default"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{ACCESS_TOKEN}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "https://gorest.co.in/public/v2/users/{{NEW_USER_ID}}/",
+					"protocol": "https",
+					"host": [
+						"gorest",
+						"co",
+						"in"
+					],
+					"path": [
+						"public",
+						"v2",
+						"users",
+						"{{NEW_USER_ID}}",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "ACCESS_TOKEN",
+			"value": "2afc85bb3c956c39739cb895731e6df924e9c683f4f31a7f6e51017ccea47945",
+			"type": "default"
+		},
+		{
+			"key": "NEW_USER_ID",
+			"value": ""
+		}
+	]
+}
